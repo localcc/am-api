@@ -1,0 +1,34 @@
+[package]
+name = "am-api"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+edition.workspace = true
+documentation = "https://docs.rs/am-api"
+keywords.workspace = true
+categories.workspace = true
+readme = "../README.md"
+
+[dependencies]
+am-api-proc-macro.workspace = true
+
+tokio.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde-hex = "0.1.0"
+
+reqwest = { version = "0.11.22", default-features = false, features = ["cookies", "json"] }
+celes = "2.4.0"
+tinytemplate = "1.2.1"
+async-stream = "0.3.5"
+futures = "0.3.29"
+time = { version = "0.3.30", features = ["serde-well-known", "macros"] }
+
+[features]
+default = ["rustls-tls"]
+rustls-tls = ["reqwest/rustls-tls"]
+native-tls = ["reqwest/native-tls"]
