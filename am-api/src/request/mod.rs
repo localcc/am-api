@@ -22,9 +22,11 @@ where
     R: DeserializeOwned,
 {
     if !response.status().is_success() {
+        println!("{}", response.status());
         let error_response: ErrorResponse = response.json().await?;
         return Err(Error::MusicError(error_response));
     }
-
-    Ok(response.json().await?)
+    let text = response.text().await?;
+    println!("{}", text);
+    Ok(serde_json::from_str(&text)?)
 }

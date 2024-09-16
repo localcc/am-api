@@ -2,7 +2,6 @@
 
 use crate::error::Error;
 use serde::{Deserialize, Serialize};
-use serde_hex::{Compact, SerHex};
 use tinytemplate::TinyTemplate;
 
 /// Artwork information
@@ -10,48 +9,26 @@ use tinytemplate::TinyTemplate;
 #[serde(rename_all = "camelCase")]
 pub struct Artwork {
     /// Original image width in pixels
-    pub width: u32,
+    pub width: Option<u32>,
     /// Original image height in pixels
-    pub height: u32,
+    pub height: Option<u32>,
     /// Template image url
     ///
     /// DO NOT USE FOR REQUESTS:
     /// for getting the image use the [`Artwork::get_image`] method
     pub url: String,
     /// Text color 1 in rgb hex
-    #[serde(default)]
-    pub text_color_1: Option<HexColor>,
+    #[serde(with = "crate::utils::hex::option", default)]
+    pub text_color_1: Option<u32>,
     /// Text color 2 in rgb hex
-    #[serde(default)]
-    pub text_color_2: Option<HexColor>,
+    #[serde(with = "crate::utils::hex::option", default)]
+    pub text_color_2: Option<u32>,
     /// Text color 3 in rgb hex
-    #[serde(default)]
-    pub text_color_3: Option<HexColor>,
+    #[serde(with = "crate::utils::hex::option", default)]
+    pub text_color_3: Option<u32>,
     /// Text color 4 in rgb hex
-    #[serde(default)]
-    pub text_color_4: Option<HexColor>,
-}
-
-/// Hex color
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct HexColor(#[serde(with = "SerHex::<Compact>")] u32);
-
-impl AsRef<u32> for HexColor {
-    fn as_ref(&self) -> &u32 {
-        &self.0
-    }
-}
-
-impl From<HexColor> for u32 {
-    fn from(val: HexColor) -> Self {
-        val.0
-    }
-}
-
-impl From<u32> for HexColor {
-    fn from(value: u32) -> Self {
-        HexColor(value)
-    }
+    #[serde(with = "crate::utils::hex::option", default)]
+    pub text_color_4: Option<u32>,
 }
 
 /// Artwork image formats

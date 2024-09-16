@@ -11,13 +11,12 @@ use crate::resource::catalog::album::Album;
 use crate::resource::library::artist::LibraryArtist;
 use crate::resource::relationship::Relationship;
 use crate::resource::{Resource, ResourceHeader};
-use crate::time::year_or_date::YearOrDate;
+use crate::utils::year_or_date::YearOrDate;
 use crate::ApiClient;
 use am_api_proc_macro::{Context, ResourceProperty};
 use futures::Stream;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-
 
 /// Library album
 #[derive(Context, Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]

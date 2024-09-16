@@ -10,14 +10,14 @@ Fetching an album by id
 async fn fetch_album() -> Result<(), Error> {
     let developer_token = "DEVELOPER_TOKEN";
     let media_user_token = "MEDIA_USER_TOKEN";
-    
+
     let client = ApiClient::new(
-        developer_token, 
-        media_user_token, 
+        developer_token,
+        media_user_token,
         celes::Country::the_united_states_of_america()
     )
-    .expect("failed to create api client");
-    
+        .expect("failed to create api client");
+
     let album = Album::get()
         .one(&client, "1676791755")
         .await?
@@ -33,7 +33,7 @@ async fn fetch_album() -> Result<(), Error> {
 }
 ```
 
-More examples can be found in the [examples](https://github.com/localcc/am-api/tree/main/am-api/examples) folder.
+More examples can be found in the [tests](https://github.com/localcc/am-api/tree/main/am-api/tests) folder.
 
 # Installation
 

@@ -12,6 +12,7 @@ pub mod library;
 pub mod personal_recommendation;
 pub mod rating;
 pub mod relationship;
+pub mod search;
 pub mod storefront;
 pub mod view;
 

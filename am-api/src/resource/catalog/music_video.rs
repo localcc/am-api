@@ -15,7 +15,7 @@ use crate::resource::library::music_video::LibraryMusicVideo;
 use crate::resource::relationship::Relationship;
 use crate::resource::view::View;
 use crate::resource::ResourceHeader;
-use crate::time::year_or_date::YearOrDate;
+use crate::utils::year_or_date::YearOrDate;
 use crate::ApiClient;
 use am_api_proc_macro::{Context, ResourceProperty};
 use serde::{Deserialize, Serialize};

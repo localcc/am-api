@@ -7,6 +7,7 @@ use crate::resource::{Resource, ResourceInfo, ResourceType};
 use crate::ApiClient;
 
 use crate::request::builder::MusicRequestBuilder;
+use reqwest::header;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -14,7 +15,6 @@ pub mod album;
 pub mod artist;
 pub mod music_video;
 pub mod playlist;
-pub mod search;
 pub mod song;
 
 /// Library builder
@@ -52,6 +52,29 @@ impl<'a> LibraryAddResourceBuilder<'a> {
         Ok(self)
     }
 
+    /// Add multiple resources to the library
+    pub fn add_resources(mut self, resources: &[Resource]) -> Result<Self, Error> {
+        for resource in resources {
+            let supported = matches!(
+                resource,
+                Resource::Album { .. }
+                    | Resource::Artist { .. }
+                    | Resource::MusicVideo { .. }
+                    | Resource::Playlist { .. }
+                    | Resource::Song { .. }
+            );
+
+            if !supported {
+                return Err(Error::InvalidResourceType);
+            }
+            self.data
+                .entry(resource.get_type())
+                .or_default()
+                .insert(resource.get_header().id.clone());
+        }
+        Ok(self)
+    }
+
     /// Send the request
     pub async fn send(mut self, client: &ApiClient) -> Result<Vec<Resource>, Error> {
         let mut request_context = self.get_request_context_drain(client);
@@ -70,6 +93,7 @@ impl<'a> LibraryAddResourceBuilder<'a> {
 
         let response = client
             .post("/v1/me/library")
+            .header(header::CONTENT_LENGTH, 0)
             .query(&request_context.query)
             .send()
             .await?;

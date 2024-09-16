@@ -16,7 +16,7 @@ use crate::resource::library::album::LibraryAlbum;
 use crate::resource::relationship::Relationship;
 use crate::resource::view::View;
 use crate::resource::{Resource, ResourceHeader};
-use crate::time::year_or_date::YearOrDate;
+use crate::utils::year_or_date::YearOrDate;
 use crate::ApiClient;
 use am_api_proc_macro::{Context, ResourceProperty};
 use serde::{Deserialize, Serialize};
@@ -107,32 +107,32 @@ pub struct AlbumRelationships {
     /// Fetch limits: 10 default, 10 maximum
     ///
     /// Possible resources: [`Artist`]
-    pub artists: Option<Relationship<Artist>>,
+    pub artists: Relationship<Artist>,
     /// The genres for the album. By default, genres not included.
     ///
     /// Fetch limits: None
     ///
     /// Possible resources: [`Genre`]
-    pub genres: Option<Relationship<Genre>>,
+    pub genres: Relationship<Genre>,
     /// The songs and music videos on the album. By default, tracks includes objects.
     ///
     /// Fetch limits: 300 default, 300 maximum
     ///
     /// Possible resources: [`MusicVideo`], [`Song`]
-    pub tracks: Option<Relationship<Resource>>,
+    pub tracks: Relationship<Resource>,
     /// The album in the user’s library for the catalog album, if any.
     ///
     /// Fetch limits: None
     ///
     /// Possible resources: [`LibraryAlbum`]
-    pub library: Option<Relationship<LibraryAlbum>>,
+    pub library: Relationship<LibraryAlbum>,
     /// The record labels for the album
     ///
     /// Fetch limits: 10 default, 10 maximum.
     ///
     /// Possible resources: [`RecordLabel`]
     #[serde(rename = "record-labels")]
-    pub record_labels: Option<Relationship<RecordLabel>>,
+    pub record_labels: Relationship<RecordLabel>,
 }
 
 /// Album views

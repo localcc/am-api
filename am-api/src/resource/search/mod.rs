@@ -1,4 +1,4 @@
-//! Apple music relationship
+//! Apple music search
 
 use crate::error::Error;
 use crate::request::context::{ContextContainer, RequestContext};
@@ -9,14 +9,18 @@ use futures::Stream;
 use reqwest::Response;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 
-/// Apple music relationship
+pub mod catalog;
+pub mod library;
+
+/// Search relationship
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Relationship<T> {
+pub struct SearchRelationship<T> {
     /// A relative location for the relationship
     #[serde(default)]
     pub href: Option<String>,
@@ -31,7 +35,7 @@ pub struct Relationship<T> {
     context: Option<Arc<RequestContext>>,
 }
 
-impl<T> Relationship<T>
+impl<T> SearchRelationship<T>
 where
     T: Clone + DeserializeOwned + ContextContainer,
 {
@@ -45,15 +49,15 @@ where
             .expect("context should always exist on relationships");
 
         try_stream! {
-            let mut relationship = relationship;
+            let mut relationship = Some(relationship);
 
-            loop {
-                for mut entry in relationship.data {
+            while let Some(rel) = relationship {
+                for mut entry in rel.data {
                     entry.set_context(context.clone());
                     yield entry;
                 }
 
-                let Some(next) = relationship.next.as_ref() else {
+                let Some(next) = rel.next.as_ref() else {
                     return;
                 };
 
@@ -63,18 +67,25 @@ where
         }
     }
 
-    async fn try_relationship_response(response: Response) -> Result<Self, Error> {
+    async fn try_relationship_response(response: Response) -> Result<Option<Self>, Error> {
         if !response.status().is_success() {
             let error_response: ErrorResponse = response.json().await?;
             return Err(Error::MusicError(error_response));
         }
 
-        let result = response.json().await?;
-        Ok(result)
+        let result: Value = response.json().await?;
+        result
+            .as_object()
+            .and_then(|e| e.get("results"))
+            .and_then(|e| e.as_object())
+            .and_then(|e| e.values().next())
+            .map(|e| serde_json::from_value(e.clone()))
+            .transpose()
+            .map_err(|e| e.into())
     }
 }
 
-impl<T> ContextContainer for Relationship<T>
+impl<T> ContextContainer for SearchRelationship<T>
 where
     T: ContextContainer,
 {
@@ -84,12 +95,12 @@ where
     }
 }
 
-impl<T> Debug for Relationship<T>
+impl<T> Debug for SearchRelationship<T>
 where
     T: Debug,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Relationship")
+        f.debug_struct("SearchRelationship")
             .field("href", &self.href)
             .field("next", &self.next)
             .field("data", &self.data)
@@ -97,7 +108,7 @@ where
     }
 }
 
-impl<T> PartialEq for Relationship<T>
+impl<T> PartialEq for SearchRelationship<T>
 where
     T: PartialEq,
 {
@@ -106,9 +117,9 @@ where
     }
 }
 
-impl<T> Eq for Relationship<T> where T: PartialEq + Eq {}
+impl<T> Eq for SearchRelationship<T> where T: PartialEq + Eq {}
 
-impl<T> Hash for Relationship<T>
+impl<T> Hash for SearchRelationship<T>
 where
     T: Hash,
 {
@@ -119,9 +130,9 @@ where
     }
 }
 
-impl<T> Default for Relationship<T> {
+impl<T> Default for SearchRelationship<T> {
     fn default() -> Self {
-        Relationship {
+        SearchRelationship {
             href: None,
             next: None,
             data: Vec::default(),

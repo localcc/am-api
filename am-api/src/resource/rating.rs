@@ -24,6 +24,7 @@ pub struct Rating {
     #[context(skip)]
     #[serde(default)]
     pub attributes: Option<RatingAttributes>,
+    #[serde(default)]
     /// Rating relationships
     pub relationships: RatingRelationships,
 }
@@ -65,7 +66,7 @@ pub struct RatingRelationships {
     /// Fetch limits: None.
     ///
     /// Posssible resources: [`Album`], [`LibraryMusicVideo`], [`LibraryPlaylist`], [`LibrarySong`], [`MusicVideo`], [`Playlist`], [`Song`], [`Station`]
-    pub content: Option<Relationship<Resource>>,
+    pub content: Relationship<Resource>,
 }
 
 /// Rating type
@@ -180,11 +181,17 @@ impl<'a> RatingPostRequestBuilder<'a> {
         mut self,
         client: &ApiClient,
         resource: &Resource,
+        rating: i32,
     ) -> Result<Option<Rating>, Error> {
         Self::check_supported(resource)?;
 
         let request_context = Arc::new(self.get_request_context_drain(client));
         let endpoint = resource.get_type();
+
+        let request = RatingRequest {
+            attributes: RatingRequestAttributes { value: rating },
+            ty: String::from("ratings"),
+        };
 
         let response = client
             .put(&format!(
@@ -192,6 +199,7 @@ impl<'a> RatingPostRequestBuilder<'a> {
                 id = resource.get_header().id
             ))
             .query(&request_context.query)
+            .json(&request)
             .send()
             .await?;
 
@@ -248,4 +256,16 @@ impl<'a> RatingPostRequestBuilder<'a> {
             false => Err(Error::InvalidResourceType),
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+struct RatingRequest {
+    attributes: RatingRequestAttributes,
+    #[serde(rename = "type")]
+    ty: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct RatingRequestAttributes {
+    value: i32,
 }

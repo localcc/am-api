@@ -1,5 +1,5 @@
 use am_api::error::Error;
-use am_api::resource::catalog::search::{CatalogSearch, CatalogSearchType};
+use am_api::resource::search::catalog::{CatalogSearch, CatalogSearchType};
 use futures::{pin_mut, StreamExt};
 
 mod common;

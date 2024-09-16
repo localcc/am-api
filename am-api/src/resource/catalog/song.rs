@@ -14,7 +14,7 @@ use crate::resource::genre::Genre;
 use crate::resource::library::song::LibrarySong;
 use crate::resource::relationship::Relationship;
 use crate::resource::ResourceHeader;
-use crate::time::year_or_date::YearOrDate;
+use crate::utils::year_or_date::YearOrDate;
 use crate::ApiClient;
 use am_api_proc_macro::{Context, ResourceProperty};
 use serde::{Deserialize, Serialize};
@@ -115,13 +115,13 @@ pub struct SongRelationships {
     /// Fetch limits: 10 default, 10 maximum
     ///
     /// Possible resources: [`Album`]
-    pub albums: Option<Relationship<Album>>,
+    pub albums: Relationship<Album>,
     /// The artists associated with the song. By default, artists includes identifiers only.
     ///
     /// Fetch limits: 10 default, 10 maximum
     ///
     /// Possible resources: [`Artist`]
-    pub artists: Option<Relationship<Artist>>,
+    pub artists: Relationship<Artist>,
     /// The composers for a catalog song
     ///
     /// Possible resources: [`Artist`]
@@ -131,22 +131,22 @@ pub struct SongRelationships {
     /// Fetch limits: None
     ///
     /// Possible resources: [`Genre`]
-    pub genres: Option<Relationship<Genre>>,
+    pub genres: Relationship<Genre>,
     /// Library song for a catalog song if added to library
     ///
     /// Possible resources: [`LibrarySong`]
-    pub library: Option<Relationship<LibrarySong>>,
+    pub library: Relationship<LibrarySong>,
     /// Music videos for a catalog song
     ///
     /// Possible resources: [`MusicVideo`]
     #[serde(rename = "music-videos")]
-    pub music_videos: Option<Relationship<MusicVideo>>,
+    pub music_videos: Relationship<MusicVideo>,
     /// The station associated with the song. By default, station is not included.
     ///
     /// Fetch limits: None
     ///
     /// Possible resources: [`Station`]
-    pub station: Option<Relationship<Station>>,
+    pub station: Relationship<Station>,
 }
 
 /// Song request builder

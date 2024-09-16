@@ -2,6 +2,7 @@ use am_api::error::Error;
 use am_api::resource::catalog::album::{
     Album, AlbumAttributesExtension, AlbumRelationshipType, AlbumViewType,
 };
+use futures::StreamExt;
 
 mod common;
 
@@ -74,9 +75,11 @@ async fn fetch_album_relationship() -> Result<(), Error> {
     let tracks_relationships = album
         .relationships
         .tracks
-        .expect("album fetch didn't return any track relationships");
+        .iter(&client)
+        .collect::<Vec<_>>()
+        .await;
 
-    assert_eq!(tracks_relationships.data.len(), 6);
+    assert_eq!(tracks_relationships.len(), 6);
 
     Ok(())
 }

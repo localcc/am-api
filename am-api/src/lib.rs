@@ -9,7 +9,7 @@ pub mod error;
 pub mod primitive;
 pub mod request;
 pub mod resource;
-pub mod time;
+pub mod utils;
 
 /// Cast a Resource to a more specific type
 ///
